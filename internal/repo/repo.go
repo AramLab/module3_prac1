@@ -32,7 +32,7 @@ func NewRepository(capacity ...int) Repository {
 
 func (r *repository) CreateTask(task Task) (int, error) {
 	r.mu.Lock()
-	defer r.mu.Lock()
+	defer r.mu.Unlock()
 
 	task.ID = r.autoID
 	r.autoID++

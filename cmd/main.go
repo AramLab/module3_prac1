@@ -33,9 +33,6 @@ func main() {
 	}
 
 	repository := repo.NewRepository(cfg.RepositoryConfig.Capacity)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "failed to initialize repository"))
-	}
 
 	serviceInstance := service.NewService(repository, logger)
 

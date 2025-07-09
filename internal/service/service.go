@@ -58,7 +58,7 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 			"error": errors.Wrap(err, "failed to create task").Error(),
 		})
 	}
-	s.log.Debugf("CreateTask: %v", task)
+	s.log.Infof("CreateTask: %v", task)
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"id": id,
 	})
@@ -128,6 +128,9 @@ func (s *service) UpdateTask(ctx *fiber.Ctx) error {
 		})
 	}
 
+	task.Title = request.Title
+	task.Description = request.Description
+	task.Status = request.Status
 	// Для частичного обновления
 	//if request.Title != "" {
 	//	task.Title = request.Title
@@ -138,8 +141,8 @@ func (s *service) UpdateTask(ctx *fiber.Ctx) error {
 	//if request.Status != "" {
 	//	task.Status = request.Status
 	//}
-
 	s.repo.UpdateTask(*task)
+	s.log.Infof("UpdateTask: %v", *task)
 
 	return ctx.Status(fiber.StatusOK).JSON(task)
 }
