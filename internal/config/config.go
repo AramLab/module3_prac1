@@ -5,7 +5,7 @@ import "time"
 const EnvPath = "local.env"
 
 type AppConfig struct {
-	LogLevel         string
+	LogLevel         string `envconfig:"LOG_LEVEL" required:"true"`
 	Rest             Rest
 	RepositoryConfig RepositoryConfig
 }

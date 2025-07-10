@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -26,7 +27,7 @@ func main() {
 	if err := envconfig.Process("", &cfg); err != nil {
 		log.Fatal(errors.Wrap(err, "failed to load configuration"))
 	}
-
+	fmt.Printf("%+v\n", cfg)
 	logger, err := customLogger.NewLogger(cfg.LogLevel)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error initializing logger"))
