@@ -15,6 +15,7 @@ const (
 	getTasksQuery         = `SELECT id, user_id, title, description, status, created_at FROM tasks;`
 	getTaskByUserIDQuery  = `SELECT id, user_id, title, description, status, created_at FROM tasks WHERE user_id = $1 LIMIT 1;`
 	getTasksByUserIDQuery = `SELECT id, user_id, title, description, status, created_at FROM tasks WHERE user_id = $1;`
+	getUserByIDQuery      = `SELECT id, username, password FROM users WHERE id = $1;`
 	updateTaskStatusQuery = `UPDATE tasks SET status = $1 WHERE id = $2;`
 	deleteTaskQuery       = `DELETE FROM tasks WHERE id = $1;`
 	createUserQuery       = `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id;`
@@ -32,6 +33,7 @@ type Repository interface {
 	GetTasks(ctx context.Context) ([]Task, error)
 	GetTaskByUserID(ctx context.Context, userID int) (*Task, error)
 	GetTasksByUserID(ctx context.Context, userID int) ([]Task, error)
+	GetUserByID(ctx context.Context, id int) (*User, error)
 
 	UpdateTaskStatus(ctx context.Context, id int, status string) error
 	DeleteTask(ctx context.Context, id int) error
@@ -136,6 +138,18 @@ func (r *repository) GetTasksByUserID(ctx context.Context, userID int) ([]Task, 
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
+}
+
+func (r *repository) GetUserByID(ctx context.Context, id int) (*User, error) {
+	var user User
+	err := r.pool.QueryRow(ctx, getUserByIDQuery, id).Scan(&user.ID, &user.Username, &user.Password)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil // пользователь не найден — это не ошибка, просто nil
+		}
+		return nil, errors.Wrap(err, "failed to get user by id")
+	}
+	return &user, nil
 }
 
 func (r *repository) UpdateTaskStatus(ctx context.Context, id int, status string) error {

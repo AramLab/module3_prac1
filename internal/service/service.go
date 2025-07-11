@@ -43,6 +43,16 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	// 🔍 Проверка существования пользователя по ID
+	user, err := s.repo.GetUserByID(ctx.Context(), request.UserID)
+	if err != nil {
+		s.log.Errorf("CreateTask: user not found: %v", err)
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "user not found"})
+	}
+
+	// Лог (необязательно): кто создаёт задачу
+	s.log.Infof("Creating task for user: %s", user.Username)
+
 	task := repo.Task{
 		UserID:      request.UserID,
 		Title:       request.Title,
