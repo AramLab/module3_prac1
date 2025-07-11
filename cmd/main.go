@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -15,6 +16,7 @@ import (
 	customLogger "github.com/AramLab/module3_prac1/internal/logger"
 	"github.com/AramLab/module3_prac1/internal/repo"
 	"github.com/AramLab/module3_prac1/internal/service"
+	"github.com/AramLab/module3_prac1/pkg/migration"
 )
 
 func main() {
@@ -32,7 +34,14 @@ func main() {
 		log.Fatal(errors.Wrap(err, "error initializing logger"))
 	}
 
-	repository := repo.NewRepository(cfg.RepositoryConfig.Capacity)
+	if err := migration.RunMigrations(cfg.PostgreSQL); err != nil {
+		logger.Fatal(errors.Wrap(err, "failed to run migration"))
+	}
+
+	repository, err := repo.NewRepository(context.Background(), cfg.PostgreSQL)
+	if err != nil {
+		logger.Fatal(errors.Wrap(err, "failed to create repository"))
+	}
 
 	serviceInstance := service.NewService(repository, logger)
 

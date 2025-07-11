@@ -26,12 +26,19 @@ func NewRouters(r *Routers) *fiber.App {
 	// Группа маршрутов с авторизацией
 	apiGroup := app.Group("/v1")
 
-	// Роут для создания задачи
+	// Пользователи
+	apiGroup.Post("/users", r.Service.CreateUser)
+
+	// Задачи
 	apiGroup.Post("/tasks", r.Service.CreateTask)
 	apiGroup.Get("/tasks", r.Service.GetTasks)
 	apiGroup.Get("/tasks/:id", r.Service.GetTaskById)
-	apiGroup.Put("/tasks/:id", r.Service.UpdateTask)
+	apiGroup.Put("/tasks/:id/status", r.Service.UpdateTaskStatus)
 	apiGroup.Delete("/tasks/:id", r.Service.DeleteTask)
+
+	// Задачи по пользователю
+	apiGroup.Get("/tasks/user/:user_id", r.Service.GetTasksByUserId)
+	apiGroup.Get("/task/user/:user_id", r.Service.GetTaskByUserId)
 
 	return app
 }
