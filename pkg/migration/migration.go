@@ -10,7 +10,7 @@ import (
 )
 
 func RunMigrations(cfg config.PostgreSQL) error {
-	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
@@ -18,7 +18,7 @@ func RunMigrations(cfg config.PostgreSQL) error {
 		cfg.Name,
 		cfg.SSLMode)
 	m, err := migrate.New("file://./pkg/migration/scripts", dbURL)
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	if err != nil {
 		return errors.Wrap(err, "failed to create migration instance")
 	}
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {

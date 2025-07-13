@@ -41,7 +41,7 @@ type Repository interface {
 
 func NewRepository(ctx context.Context, cfg config.PostgreSQL) (Repository, error) {
 	connString := fmt.Sprintf(
-		"user=%s password=%s host=%s port=%s dbname=%s sslmode=%s pool_max_conns=%d pool_max_conn_lifetime=%s pool_max_conn_idle_time=%s",
+		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s pool_max_conns=%d pool_max_conn_lifetime=%s pool_max_conn_idle_time=%s",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
