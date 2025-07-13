@@ -1,0 +1,44 @@
+package api
+
+import (
+	"github.com/AramLab/module3_prac1/internal/service"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+)
+
+// Routers - структура для хранения зависимостей роутов
+type Routers struct {
+	Service service.Service
+}
+
+// NewRouters - конструктор для настройки API
+func NewRouters(r *Routers) *fiber.App {
+	app := fiber.New()
+
+	// Настройка CORS (разрешенные методы, заголовки, авторизация)
+	app.Use(cors.New(cors.Config{
+		AllowMethods:  "GET, POST, PUT, DELETE",
+		AllowHeaders:  "Accept, Authorization, Content-Type, X-CSRF-Token, X-REQUEST-ID",
+		ExposeHeaders: "Link",
+		MaxAge:        300,
+	}))
+
+	// Группа маршрутов с авторизацией
+	apiGroup := app.Group("/v1")
+
+	// Пользователи
+	apiGroup.Post("/users", r.Service.CreateUser)
+
+	// Задачи
+	apiGroup.Post("/tasks", r.Service.CreateTask)
+	apiGroup.Get("/tasks", r.Service.GetTasks)
+	apiGroup.Get("/tasks/:id", r.Service.GetTaskById)
+	apiGroup.Put("/tasks/:id/status", r.Service.UpdateTaskStatus)
+	apiGroup.Delete("/tasks/:id", r.Service.DeleteTask)
+
+	// Задачи по пользователю
+	apiGroup.Get("/tasks/user/:user_id", r.Service.GetTasksByUserId)
+	apiGroup.Get("/task/user/:user_id", r.Service.GetTaskByUserId)
+
+	return app
+}
